@@ -1,0 +1,42 @@
+<html lang="en">
+  <head>
+    <title>Chat with GPT</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const socket = io.connect('http://localhost:3000')
+        const messageInput = document.getElementById('messageInput')
+        const submitButton = document.getElementById('submitButton')
+        const responseDiv = document.getElementById('result')
+
+        socket.on('connect', function () {
+          console.log('Connected to server')
+
+          // Listen for the server's response
+          socket.on('response', (data) => {
+            if (data.content !== undefined) {
+              responseDiv.textContent += data.content
+            }
+          })
+        })
+
+        // Emit user input to the server
+        submitButton.addEventListener('click', () => {
+          const message = messageInput.value
+          socket.emit('message', message)
+
+          messageInput.value = ''
+          responseDiv.textContent = ''
+        })
+      })
+    </script>
+  </head>
+  <body>
+    <h1>Chat with GPT</h1>
+    <input type="text" id="messageInput" />
+    <button id="submitButton">Send</button>
+    <p>
+      <div id="result"></div>
+    </p>
+  </body>
+</html>
